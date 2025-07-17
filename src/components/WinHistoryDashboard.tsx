@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { PieChart as PieChartIcon, BarChart3, Calendar, Trophy, Users, X, Sparkles, Crown, ToggleLeft, ToggleRight } from 'lucide-react';
+import { PieChart as PieChartIcon, BarChart3, Calendar, Trophy, Users, X, Sparkles, Crown, ToggleLeft, ToggleRight, TrendingUp } from 'lucide-react';
 import { Winner, EliteSpiral, DEPARTMENTS } from '../config/data';
 import ConfettiAnimation from './ConfettiAnimation';
 
