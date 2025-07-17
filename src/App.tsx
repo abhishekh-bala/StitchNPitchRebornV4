@@ -32,10 +32,8 @@ function App() {
   
   // New modal states
   const [isWinHistoryDashboardOpen, setIsWinHistoryDashboardOpen] = useState(false);
-  const [isEliteWinnersDashboardOpen, setIsEliteWinnersDashboardOpen] = useState(false);
   const [isExportDataOpen, setIsExportDataOpen] = useState(false);
   const [isBackupRestoreOpen, setIsBackupRestoreOpen] = useState(false);
-  const [showEliteAnalytics, setShowEliteAnalytics] = useState(false);
 
   // Load winners from Supabase on component mount
   useEffect(() => {
@@ -522,8 +520,6 @@ function App() {
         onClose={() => setIsWinHistoryDashboardOpen(false)}
         winners={winners}
         eliteWinners={eliteWinners}
-        showEliteAnalytics={showEliteAnalytics}
-        onToggleAnalytics={() => setShowEliteAnalytics(!showEliteAnalytics)}
       />
 
       <ExportData

@@ -2,6 +2,14 @@ import React from 'react';
 import { Building2, Users, ChevronRight, Trophy } from 'lucide-react';
 import { DEPARTMENTS, getGuidesByDepartment, Winner } from '../config/data';
 
+// Department colors - consistent throughout the application
+const DEPARTMENT_COLORS = [
+  '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+  '#06B6D4', '#F97316', '#EC4899', '#84CC16', '#6366F1',
+  '#14B8A6', '#F43F5E', '#8B5A2B', '#6B7280', '#DC2626',
+  '#7C3AED', '#059669', '#D97706', '#B91C1C', '#7C2D12'
+];
+
 interface DepartmentSelectorProps {
   selectedDepartment: string | null;
   onDepartmentSelect: (department: string) => void;
@@ -32,16 +40,22 @@ const DepartmentSelector: React.FC<DepartmentSelectorProps> = ({
           const availableGuides = allGuides.filter(guide => !winnerGuideIds.has(guide.id));
           const winnersCount = allGuides.length - availableGuides.length;
           const isSelected = selectedDepartment === department;
+          const departmentIndex = DEPARTMENTS.indexOf(department);
+          const departmentColor = DEPARTMENT_COLORS[departmentIndex % DEPARTMENT_COLORS.length];
           
           return (
             <button
               key={department}
               onClick={() => onDepartmentSelect(department)}
-              className={`group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 transform hover:scale-105 ${
+              className={`group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 transform hover:scale-105 border-2 ${
                 isSelected
-                  ? 'bg-gradient-to-br from-orange-500 to-pink-500 shadow-2xl scale-105'
-                  : 'bg-white bg-opacity-10 backdrop-blur-sm hover:bg-opacity-20'
+                  ? 'shadow-2xl scale-105 border-opacity-50'
+                  : 'bg-white bg-opacity-10 backdrop-blur-sm hover:bg-opacity-20 border-white border-opacity-20'
               }`}
+              style={{
+                backgroundColor: isSelected ? departmentColor : undefined,
+                borderColor: isSelected ? departmentColor : undefined
+              }}
             >
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-3">
@@ -77,9 +91,14 @@ const DepartmentSelector: React.FC<DepartmentSelectorProps> = ({
               </div>
 
               {/* Animated background effect */}
-              <div className={`absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-600 opacity-0 group-hover:opacity-20 transition-opacity duration-300 ${
-                isSelected ? 'opacity-30' : ''
-              }`} />
+              <div 
+                className={`absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300 ${
+                  isSelected ? 'opacity-30' : ''
+                }`}
+                style={{
+                  background: `linear-gradient(to bottom right, ${departmentColor}80, ${departmentColor}40)`
+                }}
+              />
             </button>
           );
         })}

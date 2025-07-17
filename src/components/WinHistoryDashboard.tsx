@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend } from 'recharts';
-import { TrendingUp, PieChart as PieChartIcon, BarChart3, Calendar, Trophy, Users, X, Sparkles, Crown } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { PieChart as PieChartIcon, BarChart3, Calendar, Trophy, Users, X, Sparkles, Crown, ToggleLeft, ToggleRight } from 'lucide-react';
 import { Winner, EliteSpiral, DEPARTMENTS } from '../config/data';
 import ConfettiAnimation from './ConfettiAnimation';
 
@@ -9,8 +9,6 @@ interface WinHistoryDashboardProps {
   onClose: () => void;
   winners: Winner[];
   eliteWinners?: EliteSpiral[];
-  showEliteAnalytics?: boolean;
-  onToggleAnalytics?: () => void;
 }
 
 interface DepartmentData {
@@ -20,21 +18,22 @@ interface DepartmentData {
   percentage: number;
 }
 
-interface TimelineData {
-  date: string;
-  wins: number;
-  cumulative: number;
-}
+// Department colors - consistent throughout the application
+const DEPARTMENT_COLORS = [
+  '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+  '#06B6D4', '#F97316', '#EC4899', '#84CC16', '#6366F1',
+  '#14B8A6', '#F43F5E', '#8B5A2B', '#6B7280', '#DC2626',
+  '#7C3AED', '#059669', '#D97706', '#B91C1C', '#7C2D12'
+];
 
 const WinHistoryDashboard: React.FC<WinHistoryDashboardProps> = ({ 
   isOpen, 
   onClose, 
   winners, 
-  eliteWinners = [], 
-  showEliteAnalytics = false,
-  onToggleAnalytics 
+  eliteWinners = []
 }) => {
-  const [activeChart, setActiveChart] = useState<'bar' | 'pie' | 'timeline'>('bar');
+  const [activeChart, setActiveChart] = useState<'bar' | 'pie'>('bar');
+  const [showEliteAnalytics, setShowEliteAnalytics] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [animationPhase, setAnimationPhase] = useState(0);
 
@@ -67,21 +66,7 @@ const WinHistoryDashboard: React.FC<WinHistoryDashboardProps> = ({
 
   if (!isOpen) return null;
 
-  // Prepare department data with different colors for each department
-  const departmentColors = [
-    showEliteAnalytics ? [
-      '#FFD700', '#FF6B35', '#F7931E', '#C5A572', '#DAA520',
-      '#B8860B', '#CD853F', '#D2691E', '#FF8C00', '#FFA500',
-      '#FFB347', '#FFBF00', '#FFCC5C', '#FFD700', '#FFDF00'
-    ] : [
-      '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
-      '#06B6D4', '#F97316', '#EC4899', '#84CC16', '#6366F1',
-      '#14B8A6', '#F43F5E', '#8B5A2B', '#6B7280', '#DC2626'
-    ]
-  ];
-
   const currentData = showEliteAnalytics ? eliteWinners : winners;
-  const currentColors = showEliteAnalytics ? departmentColors : departmentColors;
 
   const departmentData: DepartmentData[] = DEPARTMENTS.map((dept, index) => {
     const wins = currentData.filter(winner => winner.department === dept).length;
@@ -89,31 +74,10 @@ const WinHistoryDashboard: React.FC<WinHistoryDashboardProps> = ({
     return {
       name: dept,
       wins,
-      color: currentColors[index % currentColors.length],
+      color: DEPARTMENT_COLORS[index % DEPARTMENT_COLORS.length],
       percentage: Math.round(percentage * 10) / 10
     };
   }).filter(dept => dept.wins > 0);
-
-  // Prepare timeline data
-  const timelineData: TimelineData[] = [];
-  const sortedData = [...currentData].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-  
-  let cumulative = 0;
-  const dateGroups: { [key: string]: number } = {};
-  
-  sortedData.forEach(winner => {
-    const date = new Date(winner.timestamp).toLocaleDateString();
-    dateGroups[date] = (dateGroups[date] || 0) + 1;
-  });
-
-  Object.entries(dateGroups).forEach(([date, wins]) => {
-    cumulative += wins;
-    timelineData.push({
-      date,
-      wins,
-      cumulative
-    });
-  });
 
   const totalWins = currentData.length;
   const topDepartment = departmentData.reduce((prev, current) => 
@@ -242,15 +206,16 @@ const WinHistoryDashboard: React.FC<WinHistoryDashboardProps> = ({
               </div>
             </div>
             <div className="flex items-center gap-2">
-              {onToggleAnalytics && (
+              {eliteWinners.length > 0 && (
                 <button
-                  onClick={onToggleAnalytics}
-                  className={`px-3 md:px-4 py-2 md:py-3 rounded-xl font-semibold transition-all text-sm md:text-base ${
+                  onClick={() => setShowEliteAnalytics(!showEliteAnalytics)}
+                  className={`flex items-center gap-2 px-3 md:px-4 py-2 md:py-3 rounded-xl font-semibold transition-all text-sm md:text-base ${
                     showEliteAnalytics
                       ? 'bg-blue-600 text-white hover:bg-blue-700'
                       : 'bg-yellow-600 text-white hover:bg-yellow-700'
                   }`}
                 >
+                  {showEliteAnalytics ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
                   {showEliteAnalytics ? 'Show Regular Winners' : 'Show Elite Winners'}
                 </button>
               )}
@@ -355,18 +320,6 @@ const WinHistoryDashboard: React.FC<WinHistoryDashboardProps> = ({
                 <span className="hidden sm:inline">Pie Chart</span>
                 <span className="sm:hidden">Pie</span>
               </button>
-              <button
-                onClick={() => setActiveChart('timeline')}
-                className={`flex items-center gap-1 md:gap-2 px-3 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl font-semibold transition-all text-sm md:text-base whitespace-nowrap ${
-                  activeChart === 'timeline'
-                    ? 'bg-purple-600 text-white shadow-lg'
-                    : 'text-blue-200 hover:text-white hover:bg-white hover:bg-opacity-10'
-                }`}
-              >
-                <TrendingUp className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="hidden sm:inline">Timeline</span>
-                <span className="sm:hidden">Time</span>
-              </button>
             </div>
           </div>
 
@@ -396,9 +349,11 @@ const WinHistoryDashboard: React.FC<WinHistoryDashboardProps> = ({
                         border: 'none', 
                         borderRadius: '12px',
                         color: 'white',
-                        fontSize: '12px'
+                        fontSize: '14px',
+                        fontWeight: 'bold'
                       }}
                       formatter={(value, name) => [value, showEliteAnalytics ? 'Elite Wins' : 'Wins']}
+                      labelStyle={{ color: 'white', fontWeight: 'bold' }}
                     />
                     <Bar 
                       dataKey="wins" 
@@ -432,6 +387,15 @@ const WinHistoryDashboard: React.FC<WinHistoryDashboardProps> = ({
                           dataKey="wins"
                           animationDuration={1500}
                           labelLine={false}
+                          label={({ name, value, percent }) => 
+                            `${name}: ${value} (${(percent * 100).toFixed(1)}%)`
+                          }
+                          labelStyle={{ 
+                            fontSize: '12px', 
+                            fontWeight: 'bold', 
+                            fill: 'white',
+                            textShadow: '1px 1px 2px rgba(0,0,0,0.8)'
+                          }}
                         >
                           {departmentData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
@@ -443,8 +407,10 @@ const WinHistoryDashboard: React.FC<WinHistoryDashboardProps> = ({
                             border: 'none', 
                             borderRadius: '12px',
                             color: 'white',
-                            fontSize: '12px'
+                            fontSize: '14px',
+                            fontWeight: 'bold'
                           }}
+                          labelStyle={{ color: 'white', fontWeight: 'bold' }}
                         />
                       </PieChart>
                     </ResponsiveContainer>
@@ -469,56 +435,6 @@ const WinHistoryDashboard: React.FC<WinHistoryDashboardProps> = ({
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {activeChart === 'timeline' && (
-              <div>
-                <h3 className="text-xl md:text-2xl font-bold text-white mb-4 md:mb-6 text-center">
-                  {showEliteAnalytics ? 'Elite Wins Over Time' : 'Wins Over Time'}
-                </h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={timelineData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="#E5E7EB" 
-                      fontSize={10}
-                      angle={-45}
-                      textAnchor="end"
-                      height={80}
-                    />
-                    <YAxis stroke="#E5E7EB" fontSize={10} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(0,0,0,0.8)', 
-                        border: 'none', 
-                        borderRadius: '12px',
-                        color: 'white',
-                        fontSize: '12px'
-                      }}
-                    />
-                    <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="wins" 
-                      stroke={showEliteAnalytics ? "#FFD700" : "#10B981"}
-                      strokeWidth={3}
-                      dot={{ fill: showEliteAnalytics ? '#FFD700' : '#10B981', strokeWidth: 2, r: 4 }}
-                      name={showEliteAnalytics ? "Daily Elite Wins" : "Daily Wins"}
-                      animationDuration={1500}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="cumulative" 
-                      stroke={showEliteAnalytics ? "#FF6B35" : "#3B82F6"}
-                      strokeWidth={3}
-                      dot={{ fill: showEliteAnalytics ? '#FF6B35' : '#3B82F6', strokeWidth: 2, r: 4 }}
-                      name={showEliteAnalytics ? "Cumulative Elite Wins" : "Cumulative Wins"}
-                      animationDuration={1500}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
               </div>
             )}
           </div>

@@ -658,30 +658,30 @@ const ExportData: React.FC<ExportDataProps> = ({ isOpen, onClose, winners, loser
         onClick={onClose}
       >
         <div 
-          className="bg-white bg-opacity-10 backdrop-blur-xl border border-white border-opacity-20 rounded-3xl p-8 max-w-4xl w-full shadow-2xl export-modal-enter"
+          className="bg-white bg-opacity-10 backdrop-blur-xl border border-white border-opacity-20 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl export-modal-enter"
           onClick={handleModalClick}
         >
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl">
-                <Download className="w-8 h-8 text-white" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8">
+            <div className="flex items-center gap-2 md:gap-4">
+              <div className="p-2 md:p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl md:rounded-2xl">
+                <Download className="w-6 h-6 md:w-8 md:h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white">Export Data</h1>
-                <p className="text-blue-200">Download contest data for record-keeping</p>
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">Export Data</h1>
+                <p className="text-blue-200 text-sm md:text-base">Download contest data for record-keeping</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="text-white hover:text-gray-200 transition-colors bg-white bg-opacity-10 rounded-full p-3 hover:bg-opacity-20 backdrop-blur-sm"
+              className="text-white hover:text-gray-200 transition-colors bg-white bg-opacity-10 rounded-full p-2 md:p-3 hover:bg-opacity-20 backdrop-blur-sm flex-shrink-0"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5 md:w-6 md:h-6" />
             </button>
           </div>
 
           {/* Export Options */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-6 md:mb-8">
             {exportOptions.map((option) => {
               const IconComponent = option.icon;
               const isSelected = selectedExport === option.id;
@@ -690,23 +690,23 @@ const ExportData: React.FC<ExportDataProps> = ({ isOpen, onClose, winners, loser
                 <button
                   key={option.id}
                   onClick={() => setSelectedExport(option.id)}
-                  className={`export-option-hover text-left p-6 rounded-2xl transition-all ${
+                  className={`export-option-hover text-left p-3 sm:p-4 md:p-6 rounded-xl md:rounded-2xl transition-all ${
                     isSelected
                       ? `bg-gradient-to-r ${option.color} shadow-2xl scale-105`
                       : 'bg-white bg-opacity-10 hover:bg-opacity-20'
                   }`}
                 >
-                  <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-xl ${
+                  <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
+                    <div className={`p-2 md:p-3 rounded-lg md:rounded-xl flex-shrink-0 ${
                       isSelected ? 'bg-white bg-opacity-20' : 'bg-white bg-opacity-10'
                     }`}>
-                      <IconComponent className="w-6 h-6 text-white" />
+                      <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-white mb-2">
+                      <h3 className="text-sm sm:text-base md:text-lg font-semibold text-white mb-1 md:mb-2">
                         {option.title}
                       </h3>
-                      <p className={`text-sm ${
+                      <p className={`text-xs sm:text-sm ${
                         isSelected ? 'text-white text-opacity-90' : 'text-blue-200'
                       }`}>
                         {option.description}
@@ -719,55 +719,55 @@ const ExportData: React.FC<ExportDataProps> = ({ isOpen, onClose, winners, loser
           </div>
 
           {/* Export Preview */}
-          <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-6 mb-8">
-            <h3 className="text-xl font-semibold text-white mb-4">Export Preview</h3>
-            <div className="text-blue-200">
+          <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl md:rounded-2xl p-4 md:p-6 mb-6 md:mb-8">
+            <h3 className="text-lg md:text-xl font-semibold text-white mb-3 md:mb-4">Export Preview</h3>
+            <div className="text-blue-200 text-sm md:text-base">
               {selectedExport === 'winners-csv' && (
                 <div>
                   <p className="mb-2">📊 <strong>{winners.length}</strong> winners will be exported</p>
-                  <p className="text-sm">Includes: Name, Department, Supervisor, Selection Date & Time, Guide ID</p>
+                  <p className="text-xs md:text-sm">Includes: Name, Department, Supervisor, Selection Date & Time, Guide ID</p>
                 </div>
               )}
               {selectedExport === 'winners-pdf' && (
                 <div>
                   <p className="mb-2">📄 Professional PDF report with statistics and complete winner list</p>
-                  <p className="text-sm">Includes: Summary stats, department breakdown, formatted winner list</p>
+                  <p className="text-xs md:text-sm">Includes: Summary stats, department breakdown, formatted winner list</p>
                 </div>
               )}
               {selectedExport === 'losers-csv' && (
                 <div>
                   <p className="mb-2">📊 <strong>{losers.length}</strong> losers will be exported</p>
-                  <p className="text-sm">Includes: Name, Department, Supervisor, Selection Date & Time, Guide ID</p>
+                  <p className="text-xs md:text-sm">Includes: Name, Department, Supervisor, Selection Date & Time, Guide ID</p>
                 </div>
               )}
               {selectedExport === 'losers-pdf' && (
                 <div>
                   <p className="mb-2">📄 Professional PDF report with statistics and complete loser list</p>
-                  <p className="text-sm">Includes: Summary stats, department breakdown, formatted loser list</p>
+                  <p className="text-xs md:text-sm">Includes: Summary stats, department breakdown, formatted loser list</p>
                 </div>
               )}
               {selectedExport === 'elite-csv' && (
                 <div>
                   <p className="mb-2">👑 <strong>{eliteWinners.length}</strong> elite winners will be exported</p>
-                  <p className="text-sm">Includes: Name, Department, Supervisor, Selection Date & Time, Guide ID, Winner ID</p>
+                  <p className="text-xs md:text-sm">Includes: Name, Department, Supervisor, Selection Date & Time, Guide ID, Winner ID</p>
                 </div>
               )}
               {selectedExport === 'elite-pdf' && (
                 <div>
                   <p className="mb-2">📄 Professional PDF report with elite winners statistics</p>
-                  <p className="text-sm">Includes: Summary stats, department breakdown, formatted elite winner list</p>
+                  <p className="text-xs md:text-sm">Includes: Summary stats, department breakdown, formatted elite winner list</p>
                 </div>
               )}
               {selectedExport === 'guides-csv' && (
                 <div>
                   <p className="mb-2">👥 <strong>{GUIDES.length}</strong> guides will be exported</p>
-                  <p className="text-sm">Includes: Guide ID, Name, Department, Supervisor, Winner Status</p>
+                  <p className="text-xs md:text-sm">Includes: Guide ID, Name, Department, Supervisor, Winner Status</p>
                 </div>
               )}
               {selectedExport === 'complete-data-csv' && (
                 <div>
                   <p className="mb-2">🎯 <strong>{winners.length + losers.length + eliteWinners.length}</strong> total entries will be exported</p>
-                  <p className="text-sm">Includes: All winners, losers, and elite winners with chat IDs, complete contest data</p>
+                  <p className="text-xs md:text-sm">Includes: All winners, losers, and elite winners with chat IDs, complete contest data</p>
                 </div>
               )}
             </div>
@@ -776,28 +776,28 @@ const ExportData: React.FC<ExportDataProps> = ({ isOpen, onClose, winners, loser
           {/* Export Button */}
           <div className="flex justify-center">
             {exportSuccess ? (
-              <div className="flex items-center gap-3 bg-green-500 text-white px-8 py-4 rounded-xl success-bounce">
-                <CheckCircle className="w-6 h-6" />
-                <span className="font-semibold">Export Successful!</span>
+              <div className="flex items-center gap-2 md:gap-3 bg-green-500 text-white px-4 md:px-8 py-3 md:py-4 rounded-lg md:rounded-xl success-bounce">
+                <CheckCircle className="w-5 h-5 md:w-6 md:h-6" />
+                <span className="font-semibold text-sm md:text-base">Export Successful!</span>
               </div>
             ) : (
               <button
                 onClick={handleExport}
                 disabled={isExporting}
-                className={`flex items-center gap-3 px-8 py-4 rounded-xl font-semibold text-lg transition-all transform hover:scale-105 ${
+                className={`flex items-center gap-2 md:gap-3 px-4 md:px-8 py-3 md:py-4 rounded-lg md:rounded-xl font-semibold text-sm md:text-lg transition-all transform hover:scale-105 ${
                   isExporting
                     ? 'bg-gray-500 cursor-not-allowed'
                     : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 shadow-lg'
                 } text-white`}
               >
-                <Download className={`w-6 h-6 ${isExporting ? 'animate-bounce' : ''}`} />
+                <Download className={`w-5 h-5 md:w-6 md:h-6 ${isExporting ? 'animate-bounce' : ''}`} />
                 {isExporting ? 'Exporting...' : 'Export Data'}
               </button>
             )}
           </div>
 
           {/* Info */}
-          <div className="mt-6 text-center text-blue-200 text-sm">
+          <div className="mt-4 md:mt-6 text-center text-blue-200 text-xs md:text-sm">
             <p>Files will be downloaded to your default download folder</p>
           </div>
         </div>
