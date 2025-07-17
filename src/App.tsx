@@ -238,19 +238,7 @@ function App() {
 
   const handleRestoreWinners = async (restoredWinners: Winner[], restoredLosers?: Loser[], restoredEliteWinners?: EliteSpiral[]) => {
     try {
-      // First, purge existing data
-      const { error: winnersError } = await supabase
-        .from('winners')
-        .delete()
-        .gte('created_at', '1900-01-01');
-
-      if (restoredLosers) {
-        const { error: losersError } = await supabase
-          .from('losers')
-          .delete()
-          .gte('created_at', '1900-01-01');
-      }
-      
+      // First, purge existing data in correct order (respecting foreign key constraints)
       if (restoredEliteWinners) {
         const { error: eliteError } = await supabase
           .from('elite_spiral')
@@ -258,9 +246,45 @@ function App() {
           .gte('created_at', '1900-01-01');
       }
       
-      // Then insert restored data
+      if (restoredLosers) {
+        const { error: losersError } = await supabase
+          .from('losers')
+          .delete()
+          .gte('created_at', '1900-01-01');
+      }
+      
+      const { error: winnersError } = await supabase
+        .from('winners')
+        .delete()
+        .gte('created_at', '1900-01-01');
+
+      // Insert winners first and create mapping of old IDs to new IDs
+      const winnerIdMapping: { [oldId: string]: string } = {};
+      
       for (const winner of restoredWinners) {
-        await saveWinnerToDatabase(winner);
+        const oldId = winner.id;
+        try {
+          const { data, error } = await supabase
+            .from('winners')
+            .insert([{
+              guide_id: winner.guide_id,
+              name: winner.name,
+              department: winner.department,
+              supervisor: winner.supervisor,
+              timestamp: winner.timestamp,
+              chat_ids: winner.chat_ids || []
+            }])
+            .select()
+            .single();
+
+          if (error) {
+            console.error('Error saving winner to database:', error);
+          } else if (data && oldId) {
+            winnerIdMapping[oldId] = data.id;
+          }
+        } catch (error) {
+          console.error('Error connecting to database:', error);
+        }
       }
       
       if (restoredLosers) {
@@ -271,7 +295,14 @@ function App() {
       
       if (restoredEliteWinners) {
         for (const elite of restoredEliteWinners) {
-          await saveEliteWinnerToDatabase(elite);
+          // Update winner_id with the new mapped ID
+          const updatedElite = {
+            ...elite,
+            winner_id: elite.winner_id && winnerIdMapping[elite.winner_id] 
+              ? winnerIdMapping[elite.winner_id] 
+              : null
+          };
+          await saveEliteWinnerToDatabase(updatedElite);
         }
       }
       
